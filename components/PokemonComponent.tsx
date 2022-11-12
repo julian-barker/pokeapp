@@ -1,67 +1,55 @@
-import { useEffect, useState } from "react";
-import { GetStaticProps } from "next";
-import { getPokeTypes, getRandomTeam } from '../modules';
-import { Pokemon, DamageMap } from '../modules/pokeApiTypes';
-import Image from 'next/image';
+// import { getPokeTypes } from '../modules';
+import { DamageMap } from '../modules/pokeApiTypes';
 
 interface Props {
-  damages?: DamageMap;
-  types?: string[];
+  types: string[];
+  damages: DamageMap;
 };
 
+const multColor = (mult: number): string => {
+  if (mult < 1) return 'text-red-400 font-semibold';
+  if (mult > 1) return 'text-green-400 font-semibold';
+  return '';
+};
+
+function capitalize(str: string): string {
+  const transformed = str[0].toUpperCase() + str.slice(1);
+  // console.log("🚀 ~ file: team-builder.tsx ~ line 11 ~ capitalize ~ transformed", transformed);
+
+  return transformed;
+}
+
 export default function PokemonComponent( props: Props ) {
-    // const [damages, setDamages] = useState({});
-    const [team, setTeam] = useState<Pokemon[]>();
+  const { types, damages } = props;
 
-    // useEffect(() => {
-    //   getPokeTypes()
-    //     .then(data => setDamages(data));
-    // }, []);
-
-    // useEffect(() => {
-    //   getRandomTeam()
-    //     .then(setTeam);
-    // }, []);
-
-    console.log(props.damages);
-
+  const cell = 'border-2 border-gray-200 border-collapse p-1 w-24';
+  
   return (
-    <div className="flex flex-col items-center">
-      {/* <p>I am here</p>
-      {Object.keys(damages).map(t => 
-        <div key={t}>
-          <p>Type: {t}</p>
-        </div>
-      )} */}
-      <div className="grid grid-cols-3 gap-8 mb-4">
-        {team ? team.map(pokemon => 
-          <div key={pokemon.id}>
-            <h3 className="text-center font-bold text-lg">
-              {pokemon.name}
-              </h3> 
-            <img 
-              src={pokemon.sprites.front} 
-              width='200' height='200' 
-              alt={pokemon.name} 
-              style={{imageRendering: 'pixelated'}} 
-              className='border-2 p-4 border-zinc-200 bg-gray-900'
-            />
-          </div>
-        ) : null}
+    <div className="mt-12 flex flex-col items-center">
+      <h2 className='my-6 font-bold text-3xl text-yellow-400' > Type Advantage Chart </h2>
+      <div className="w-5/6 overflow-x-scroll">
+        <table className='mx-auto text-center text-gray-200 overflow-x-scroll'>
+          <thead>
+            <tr>
+              <th className={cell}> Attack \\ Defend </th>
+              { types.map(type => <th key={type} className={`${cell} bg-gray-900 text-lg`} > {capitalize(type)} </th>) }
+            </tr>
+          </thead>
+          <tbody>
+            { types.map((t, idx1) => 
+              <tr key={idx1}>
+                <td className={`${cell} text-lg bg-gray-900`} > {capitalize(t)} </td>
+                {types.map((type, idx2) => {
+                  const mult = damages[t][type] || 1;
+                  return (<td key={idx2} className={`${cell} bg-slate-700 ${multColor(mult)}`}> x{mult} </td>)
+                })}
+              </tr>) 
+            }
+          </tbody>
+        </table>
       </div>
-      <button className="text-lg border-1 rounded-md w-48 bg-gray-300 text-gray-900" onClick={() => {
-        getRandomTeam()
-          .then(setTeam);
-      }} >
-        RE-ROLL TEAM
-      </button>
     </div>
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const res = await getPokeTypes();
-  console.log(res);
 
-  return {props: {damages: res.damages, types: res.types}}
-}

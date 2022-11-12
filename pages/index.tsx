@@ -1,9 +1,20 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
+import { promises as fs } from 'fs'
+import path from 'path'
 import PokemonComponent from '../components/PokemonComponent'
+import { getPokeTypes } from '../modules'
+import { DamageMap } from '../modules/pokeApiTypes';
+import { GetStaticProps } from 'next'
 
-export default function Home() {
+interface Props {
+  types: string[];
+  damages: DamageMap;
+};
+
+export default function Home(props: Props) {
 
   return (
     <div className={styles.container}>
@@ -17,8 +28,13 @@ export default function Home() {
         <h1 className='text-7xl mb-8'>
           This is <span className='text-red-700'>Poke</span><span className='text-gray-200'>App</span>!
         </h1>
+
+        <nav className='flex gap-x-12'>
+          <Link href='./' className='border-4 border-yellow-500 px-4 py-2 w-48 text-center text-2xl text-yellow-200 hover:underline'> Home </Link>
+          <Link href='./team-builder' className='border-4 border-yellow-500 px-4 py-2 w-48 text-center text-2xl text-yellow-200 hover:underline'> Team Builder </Link>
+        </nav>
         
-        <PokemonComponent />
+        <PokemonComponent {...props} />
 
       </main>
 
@@ -38,4 +54,28 @@ export default function Home() {
   )
 }
 
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const dataPath = path.join(process.cwd(), 'data/pokemonTypeData.json');
+  const data = await fs.readFile(dataPath, 'utf-8')
 
+  const typeData = JSON.parse(data);
+
+  return {
+    props: {
+      types: typeData.types,
+      damages: typeData.damages,
+    }
+  };
+}
+
+// export const getStaticProps: GetStaticProps<Props> = async () => {
+//   const res = await getPokeTypes();
+//   console.log(res);
+
+//   return {
+//     props: {
+//       types: res.types,
+//       damages: res.damages,
+//     }
+//   };
+// }
