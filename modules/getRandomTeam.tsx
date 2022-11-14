@@ -8,8 +8,12 @@ const fetcher = (url: string) => fetch(url)
   });
 
 export default async function getRandomTeam() {
-  const logHeaderStyle = 'color: red; font-size: 24px; font-style: bold';
-  console.log('%c-------------\nGenerating a new Team.....\n-------------', logHeaderStyle);
+  const logHeaderStyle = [
+    'font-size: 24px; font-style: bold',
+    'color: red; font-size: 24px; font-style: bold',
+    'font-size: 24px; font-style: bold'
+  ];
+  console.log('%c-------------\n%cGenerating a New Team.....\n%c-------------', ...logHeaderStyle);
 
   const ids: number[] = [];
   Array(6).fill(0).forEach(v => {

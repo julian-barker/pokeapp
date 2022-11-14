@@ -1,9 +1,18 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { NavMenu, Loading } from '../components'
+import { promises as fs } from 'fs'
+import path from 'path'
+import { NavMenu, TypeChart } from '../components'
+import { DamageMap } from '../modules/pokeApiTypes';
+import { GetStaticProps } from 'next'
 
-export default function Home() {
+interface Props {
+  types: string[];
+  damages: DamageMap;
+};
+
+export default function TypeData(props: Props) {
 
   return (
     <div className={styles.container}>
@@ -19,8 +28,9 @@ export default function Home() {
         <h1 className='text-7xl mb-4'>
           This is <span className='text-red-700'>Poke</span><span className='text-gray-200'>App</span>!
         </h1>
-
-        <Loading />
+        <div className='my-auto'>
+          <TypeChart {...props} />
+        </div>
       </main>
 
       <footer className={styles.footer}>
@@ -37,4 +47,19 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const dataPath = path.join(process.cwd(), 'data/pokemonTypeData.json');
+  const data = await fs.readFile(dataPath, 'utf-8');
+  const typeData = JSON.parse(data);
+
+  // console.log(typeData);
+
+  return {
+    props: {
+      types: typeData.types,
+      damages: typeData.damages,
+    }
+  };
 }

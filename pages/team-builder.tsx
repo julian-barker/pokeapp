@@ -1,10 +1,10 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 import { useState } from "react";
 import { getRandomTeam } from '../modules';
 import { Pokemon } from '../modules/pokeApiTypes';
+import { Loading, NavMenu } from '../components';
 
 function capitalize(str: string): string {
   const transformed = str[0].toUpperCase() + str.slice(1);
@@ -13,6 +13,26 @@ function capitalize(str: string): string {
 
 export default function TeamBuilder() {
   const [team, setTeam] = useState<Pokemon[]>();
+  const [debounce, setDebounce] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const generateTeam = () => {
+    if(debounce) {
+      console.log('waiting for debounce)');
+      return;
+    }
+    setLoading(true);
+    getRandomTeam()
+      .then(data => {
+        setTeam(data);
+        setLoading(false);
+      });
+    setDebounce(true);
+    setTimeout(() => {
+      setDebounce(false)
+      console.log('debounce reset');
+    }, 5000);
+  }
   
   return (
     <div className={styles.container}>
@@ -22,17 +42,14 @@ export default function TeamBuilder() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className='text-7xl mb-8'>
+      <NavMenu />
+
+      <main className='h-full flex flex-col items-center justify-center'>
+        <h1 className='text-7xl mb-4'>
           This is <span className='text-red-700'>Poke</span><span className='text-gray-200'>App</span>!
         </h1>
-
-        <nav className='mb-6 flex gap-x-8'>
-          <Link href='./' className='text-2xl text-yellow-200 hover:underline'> Home </Link>
-          <Link href='./team-builder' className='text-2xl text-yellow-200 hover:underline'> Team Builder </Link>
-        </nav>
         
-        <div className="flex flex-col items-center">
+        <div className="my-auto flex flex-col items-center">
           <div className="grid grid-cols-3 gap-8 mb-4">
             {team ? team.map(pokemon => 
               <div key={pokemon.id}>
@@ -47,16 +64,15 @@ export default function TeamBuilder() {
                   className='border-2 p-4 border-zinc-200 bg-gray-900'
                 />
               </div>
-            ) : null}
+            ) : loading ? <Loading/> : null}
           </div>
-          <button className="border-1 rounded-md w-48 bg-gray-300 font-semibold text-lg text-gray-900" onClick={() => {
-            getRandomTeam()
-              .then(setTeam);
-          }} >
+
+          <button className="border-1 rounded-md w-48 bg-gray-300 font-semibold text-lg text-gray-900" 
+            onClick={generateTeam} 
+          >
             GENERATE A TEAM
           </button>
         </div>
-
       </main>
 
       <footer className={styles.footer}>

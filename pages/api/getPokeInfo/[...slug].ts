@@ -1,8 +1,8 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
+import prisma from '../../../lib/prismadb';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const fetcher = (url: string) => fetch(url)
   .then((res) => res.json())
@@ -21,7 +21,6 @@ export default async function handler(
 ) {
   try {
     const { slug } = req.query;
-    console.log("🚀 ~ file: [...slug].ts ~ line 22 ~ slug", slug);
     
     if (typeof slug === 'string' || slug === undefined || slug.length < 2) {
       throw 'slug of invalid type - expected string[]';
@@ -38,9 +37,9 @@ export default async function handler(
     
     if(!result) {
       result = await fetcher(`https://pokeapi.co/api/v2/${dataType}/${id}`);
-      source = 'pokeAPI call';
-
       if (!result) throw 'API call failed';
+      
+      source = 'pokeAPI call';
 
       const writeResponse = await prismaTable?.create({
         data: {
@@ -49,7 +48,9 @@ export default async function handler(
         }
       });
       
-      if (writeResponse) console.log(`Performed write - ${dataType}: ${id}`);
+      if (writeResponse) {
+        console.log(`Performed write - ${dataType}: ${id}`)
+      };
     }
     
     const responseObj = { 
@@ -74,7 +75,9 @@ async function query(table: string, prismaTable: PrismaModel, id: number) {
       body: true
     }
   });
-  if (dbResponse) console.log(`Performed read - ${table}: ${id}`);
+  if (dbResponse) {
+    console.log(`Performed read - ${table}: ${id}`)
+  };
 
   return dbResponse?.body;
 }
