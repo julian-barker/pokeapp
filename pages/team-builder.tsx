@@ -15,8 +15,13 @@ export default function TeamBuilder() {
   const [team, setTeam] = useState<Pokemon[]>();
   const [debounce, setDebounce] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rolls, setRolls] = useState(3);
 
   const generateTeam = () => {
+    if (rolls === 0) {
+      alert("You've used up all your re-rolls. What you see is what you got!");
+      return;
+    }
     if(debounce) {
       console.log('waiting for debounce)');
       return;
@@ -27,6 +32,7 @@ export default function TeamBuilder() {
         setTeam(data);
         setLoading(false);
       });
+    setRolls(rolls - 1);
     setDebounce(true);
     setTimeout(() => {
       setDebounce(false)
@@ -49,29 +55,47 @@ export default function TeamBuilder() {
           This is <span className='text-red-700'>Poke</span><span className='text-gray-200'>App</span>!
         </h1>
         
-        <div className="my-auto flex flex-col items-center">
-          <div className="grid grid-cols-3 gap-8 mb-4">
-            {team ? team.map(pokemon => 
-              <div key={pokemon.id}>
-                <h3 className="text-center font-bold text-lg">
-                  {capitalize(pokemon.name)}
-                </h3> 
-                <img 
-                  src={pokemon.sprites.front} 
-                  width='200' height='200' 
-                  alt={capitalize(pokemon.name)} 
-                  style={{imageRendering: 'pixelated'}} 
-                  className='border-2 p-4 border-zinc-200 bg-gray-900'
-                />
+        <div className="my-auto w-full flex flex-col items-center">
+          {loading ? <Loading/> : team ? 
+            <div className='w-full flex flex-col items-center'>
+              <h2 className='mb-3 font-bold text-3xl text-yellow-200'>Your Team:</h2>
+              <div className="grid grid-cols-3 gap-8 mb-4">
+                {team.map(pokemon => 
+                  <div key={pokemon.id}>
+                    <h3 className="text-center font-bold text-lg">
+                      {capitalize(pokemon.name)}
+                    </h3> 
+                    <img 
+                      src={pokemon.sprites.front} 
+                      width='200' height='200' 
+                      alt={capitalize(pokemon.name)} 
+                      style={{imageRendering: 'pixelated'}} 
+                      className='border-2 p-4 border-zinc-200 bg-gray-900 disable'
+                    />
+                  </div>
+                )}
               </div>
-            ) : loading ? <Loading/> : null}
-          </div>
+            </div>
+          : null}
 
-          <button className="border-1 rounded-md w-48 bg-gray-300 font-semibold text-lg text-gray-900" 
+          {rolls > 0 ? 
+            <button className={`my-2 border-1 rounded-md px-4 py-2 w-60 bg-gray-300 font-semibold text-lg text-gray-900 ${rolls > 0 ? '' : 'disabled'} disabled:opacity-50`}
             onClick={generateTeam} 
-          >
-            GENERATE A TEAM
-          </button>
+            >
+              GENERATE A TEAM
+            </button>
+          : null}
+          
+          <p className='my-2 font-bold text-gray-100'> {rolls} re-rolls remaining</p>
+          
+          {team ?
+            <button className="my-2 border-2 border-gray-100 rounded-md px-4 py-2 w-32 bg-gray-900 font-bold text-2xl text-gray-200 hover:scale-125 transition-all hover:invert" 
+              onClick={() => alert('Redirect to Battle Page')} 
+            >
+              Battle!
+            </button>
+          : null}
+          
         </div>
       </main>
 
