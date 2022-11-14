@@ -8,6 +8,7 @@ import PokemonComponent from '../components/PokemonComponent'
 import { getPokeTypes } from '../modules'
 import { DamageMap } from '../modules/pokeApiTypes';
 import { GetStaticProps } from 'next'
+import { Suspense } from 'react'
 
 interface Props {
   types: string[];

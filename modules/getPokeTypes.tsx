@@ -36,7 +36,6 @@ export default async function getPokeTypes() {
   delete damages.unknown;
   
   console.log("🚀 ~ file: getPokeTypes.tsx ~ line 21 ~ getPokeTypes ~ damages", damages);
-  // console.log(damages, types);
 
   return { 
     types: types.slice(0,-2),

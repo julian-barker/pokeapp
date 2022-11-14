@@ -7,15 +7,13 @@ interface Props {
 };
 
 const multColor = (mult: number): string => {
-  if (mult < 1) return 'text-red-400 font-semibold';
-  if (mult > 1) return 'text-green-400 font-semibold';
-  return '';
+  if (mult < 1) return 'text-red-400 font-light';
+  if (mult > 1) return 'text-green-400 font-bold';
+  return 'font-medium';
 };
 
 function capitalize(str: string): string {
   const transformed = str[0].toUpperCase() + str.slice(1);
-  // console.log("🚀 ~ file: team-builder.tsx ~ line 11 ~ capitalize ~ transformed", transformed);
-
   return transformed;
 }
 

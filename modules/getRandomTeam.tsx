@@ -1,8 +1,16 @@
+import { PokeType, Pokemon, PokeMove, PokeStat } from './pokeApiTypes';
 
-import { PokeType , Pokemon, BattlePokemon, CompactMove, PokeMove, PokeStat } from './pokeApiTypes';
-
+const fetcher = (url: string) => fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+    return data.result
+  });
 
 export default async function getRandomTeam() {
+  const logHeaderStyle = 'color: red; font-size: 24px; font-style: bold';
+  console.log('%c-------------\nGenerating a new Team.....\n-------------', logHeaderStyle);
+
   const ids: number[] = [];
   Array(6).fill(0).forEach(v => {
     let id = Math.ceil(Math.random() * 151);
@@ -14,8 +22,7 @@ export default async function getRandomTeam() {
   console.log(ids);
   
   const team = Promise.all(ids.map(async (id) => {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-      .then(res => res.json());
+    const response = await fetcher(`/api/getPokeInfo/pokemon/${id}`);
 
     const moves = await getMoves(response.moves);
     const types = response.types.map((t: {slot: number, type: PokeType}) => t.type.name);
@@ -53,9 +60,12 @@ async function getMoves(moves: PokeMove[]) {
   });
 
   const moveset = Promise.all(moveIdxs.map(async (idx) => {
-    const response = await fetch(moves[idx].move.url)
-      .then(res => res.json());
-      
+    const moveLink = moves[idx].move.url;
+    const re = /(?<=\/)(\d+)(?=\/$)/; // matches just a series of numbers number from the end of a link
+    const moveID = parseInt(moveLink.match(re)![0]); 
+
+    const response = await fetcher(`/api/getPokeInfo/move/${moveID}`);
+
     const move = {
       id: response.id,
       name: response.name,

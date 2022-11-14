@@ -8,8 +8,6 @@ import { Pokemon } from '../modules/pokeApiTypes';
 
 function capitalize(str: string): string {
   const transformed = str[0].toUpperCase() + str.slice(1);
-  // console.log("🚀 ~ file: team-builder.tsx ~ line 11 ~ capitalize ~ transformed", transformed);
-
   return transformed;
 }
 
