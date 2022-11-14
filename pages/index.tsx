@@ -20,7 +20,8 @@ export default function Home() {
           This is <span className='text-red-700'>Poke</span><span className='text-gray-200'>App</span>!
         </h1>
 
-        <Loading />
+        <div>Under Construction</div>
+
       </main>
 
       <footer className={styles.footer}>
